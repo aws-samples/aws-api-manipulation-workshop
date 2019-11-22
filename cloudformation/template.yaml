@@ -261,9 +261,9 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AutoScalingGroupName: !Sub '${Prefix}-asg-app'
-      MinSize: 1
-      MaxSize: 1
-      DesiredCapacity: 1
+      MinSize: 0
+      MaxSize: 0
+      DesiredCapacity: 0
       HealthCheckType: ELB
       HealthCheckGracePeriod: 300
       TargetGroupARNs:
