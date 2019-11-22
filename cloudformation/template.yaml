@@ -1,0 +1,365 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS APIs & Automation - IoT App
+Metadata: {}
+Parameters:
+  Prefix:
+    Description: Environment Prefix
+    Type: String
+    Default: iot
+  VPCCIDR:
+    Description: IoT App VPC
+    Type: String
+    Default: 172.16.0.0/16
+  DMZSubnet1CIDR:
+    Description: DMZ Subnet 1
+    Type: String
+    Default: 172.16.1.0/24
+  DMZSubnet2CIDR:
+    Description: DMZ Subnet 2
+    Type: String
+    Default: 172.16.2.0/24
+  AppSubnet1CIDR:
+    Description: Application Subnet 1
+    Type: String
+    Default: 172.16.3.0/24
+  AppSubnet2CIDR:
+    Description: Application Subnet 2
+    Type: String
+    Default: 172.16.4.0/24
+Mappings:
+  RegionMap:
+    us-east-1:
+      IoTGwImage: ami-0de53d8956e8dcf80
+    us-east-2:
+      IoTGwImage: ami-02bcbb802e03574ba
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: !Ref VPCCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-vpc'
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-igw'
+  InternetGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+  NATGateway1:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId: !GetAtt 
+        - NATGateway1EIP
+        - AllocationId
+      SubnetId: !Ref DMZSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-nat_gw1'
+  NATGateway1EIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+  NATGateway2:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId: !GetAtt 
+        - NATGateway2EIP
+        - AllocationId
+      SubnetId: !Ref DMZSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-nat_gw2'
+  NATGateway2EIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc      
+  DMZSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs ''
+      CidrBlock: !Ref DMZSubnet1CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-dmz_subnet1'
+  DMZSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs ''
+      CidrBlock: !Ref DMZSubnet2CIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-dmz_subnet2'
+  AppSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs ''
+      CidrBlock: !Ref AppSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-app_subnet1'
+  AppSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs ''
+      CidrBlock: !Ref AppSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-app_subnet2'
+  DMZRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-dmz_rt'
+  DMZDefaultRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref DMZRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  App1RouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-app1_rt'
+  App1DefaultRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref App1RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway1
+  App2RouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-app2_rt'
+  App2DefaultRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref App2RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway2 
+  DMZSubnet1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref DMZRouteTable
+      SubnetId: !Ref DMZSubnet1
+  DMZSubnet2RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref DMZRouteTable
+      SubnetId: !Ref DMZSubnet2
+  AppSubnet1RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref App1RouteTable
+      SubnetId: !Ref AppSubnet1
+  AppSubnet2RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref App2RouteTable
+      SubnetId: !Ref AppSubnet2
+  ALBSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+      GroupName: !Sub '${Prefix}-alb_sg'
+      GroupDescription: !Sub '${Prefix}-alb_sg'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-alb_sg'
+  AppSecurityGroup:
+    DependsOn:
+      - ALBSecurityGroup
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+      VpcId: !Ref VPC
+      GroupName: !Sub '${Prefix}-app_sg'
+      GroupDescription: !Sub '${Prefix}-app_sg'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-app_sg'
+  AppALB:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Type: application
+      Scheme: internet-facing
+      Subnets:
+        - !Ref DMZSubnet1
+        - !Ref DMZSubnet2
+      Name: !Sub '${Prefix}-alb'
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-alb'
+  AppALBTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /
+      Matcher:
+        HttpCode: '200'
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      Name: !Sub '${Prefix}-app-alb-tg'
+  AppALBListener80:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppALBTargetGroup
+      LoadBalancerArn: !Ref AppALB
+      Port: 80
+      Protocol: HTTP
+  AppASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub '${Prefix}-asg-app'
+      MinSize: 1
+      MaxSize: 1
+      DesiredCapacity: 1
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      TargetGroupARNs:
+        - !Ref AppALBTargetGroup
+      VPCZoneIdentifier:
+        - !Ref AppSubnet1
+        - !Ref AppSubnet2
+      LaunchConfigurationName: !Ref AppLC
+      Tags:
+        - Key: Name
+          Value: !Sub '${Prefix}-gateway'
+          PropagateAtLaunch: true     
+  AppLC: 
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !FindInMap 
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - IoTGwImage
+      InstanceType: 't2.micro'
+      IamInstanceProfile: !Ref AppInstanceProfile
+      SecurityGroups: 
+        - !Ref AppSecurityGroup
+      UserData: !Base64 |
+        #!/bin/bash -xe
+        sudo yum install -y gcc-c++ make
+        curl -sL https://rpm.nodesource.com/setup_12.x | sudo -E bash -
+        sudo yum install -y nodejs
+        bucket=$(aws ssm get-parameter --name /iot/bucket --query 'Parameter.Value' --output text --region us-east-1)
+        sudo aws s3 sync s3://$bucket/gateway /gateway
+        cd /gateway
+        sudo npm install
+        sudo nohup node server.js 2>&1 &
+      LaunchConfigurationName: !Sub '${Prefix}-app-lc'
+  AppInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref AppRole             
+  AppRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
+      Policies:
+        - PolicyName: !Sub '${Prefix}-AppPolicy'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - 's3:PutObject'
+                  - 'ssm:GetParameter'
+                Resource: '*'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      RoleName: !Sub '${Prefix}-app-role'
+  EventNotificationLambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'
+      Policies:
+        - PolicyName: !Sub '${Prefix}-SNSPublisher'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'sns:Publish'
+                Resource: '*'      
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      RoleName: !Sub '${Prefix}-event-notification-lambda-role'
+  Cloud9:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties: 
+      InstanceType: 't2.micro'
+      Name: !Sub '${Prefix}-environment'
+      Description: !Sub '${Prefix}-environment'
+      SubnetId: !Ref DMZSubnet1
+Outputs:
+  LoadBalancerDNS:
+    Value: !GetAtt AppALB.DNSName

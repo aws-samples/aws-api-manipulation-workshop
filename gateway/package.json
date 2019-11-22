@@ -1,0 +1,14 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "network-iot-server",
+  "author": "tgpadua",
+  "license": "ISC",
+  "engines": {
+    "node": "10"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.492.0",
+    "express": "^4.17.1"
+  }
+}
