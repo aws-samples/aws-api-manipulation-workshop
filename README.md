@@ -67,6 +67,7 @@ _Note: **<YOUR_PREFIX>** must be replaced with your nickname to avoid conflicts 
 6. On Environment variables add two variables:
    - **'THRESHOLD'** with value **'95'**
    - **'TOPIC_ARN'** with a value containing the SNS Topic ARN annotated previously
+7. Click on **Save** button
 
 
 ## Configure an S3 Event ##
