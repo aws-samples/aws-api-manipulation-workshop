@@ -102,9 +102,11 @@ aws --region us-east-1 cloudformation update-stack --stack-name iot-stack --temp
 1. Still on the **bash** tab lets run the IoT client to test the solution, running the following commands
 ```
 cd thing
-./generateRequest.sh 5
+./generateRequest.sh <ELB_DNS> 5
 ```
-_NOTE: This will generate 5x random requests, for each of them with **bandwidth** greater than 95 you will receive a notification e-mail. If none of them has this value, please keep repeating the last command._
+_Note 1: **<ELB_DNS>** must be replaced with the value of **LoadBalancerDNS**_
+
+_Note 2: This will generate 5x random requests, for each of them with **bandwidth** greater than 95 you will receive a notification e-mail. If none of them has this value, please keep repeating the last command._
 
 
 ## Clean up
