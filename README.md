@@ -105,7 +105,7 @@ DesiredCapacity: 2
 ```
 aws --region us-east-1 cloudformation update-stack --stack-name iot-stack --template-body file://cloudformation/template.yaml --capabilities CAPABILITY_NAMED_IAM 
 ```
-
+7. Before you move to the next chapter the server application should be up and running. It may take a few minutes, you can verify its progress acessing in your browser the URL you collected from CloudFormation output key **LoadBalancerDNS**. Once it's ready you should see an 'alive' message
 
 ## Run IoT client ##
 1. Still on the **bash** tab lets run the IoT client to test the solution, running the following commands
