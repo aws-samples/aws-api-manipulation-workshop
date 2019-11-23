@@ -50,19 +50,28 @@ _Note: **<YOUR_PREFIX>** must be replaced with your nickname to avoid conflicts 
 ## Create a SNS Topic & Subscription ##
 1. Open the SNS (Simple Notification Service) console at https://console.aws.amazon.com/sns
 2. In the navigation pane select Topics, and then click on **Create topic** button
-3. Enter the topic name as **'IoT-HighBandwidthUsage'** and then click on **Create topic** button
-4. Under the Details panel, take note of topic **ARN** which should look like _arn:aws:sns:us-east-1:123456789012:IoT-HighBandwidthUsage_
-5. In the navigation pane select Subscriptions, and then click on **Create subscription** button
-6. In Topic ARN select the value from step 4
-7. In Protocol select **'Email'**
-8. Enter your e-mail on **'Endpoint'** 
+3. Enter the topic name as **'IoT-HighBandwidthUsage'**
+4. Expand the **Access policy** section, on method role choose to **Advanced** and update the **Condition** property as follow on JSON editor:
+```
+"Condition": {
+  "ArnLike": {
+    "AWS:SourceArn": "arn:aws:s3:*:*:*"
+  }
+}
+```
+5. Click on **Create topic** button
+6. Under the Details panel, take note of topic **ARN** which should look like _arn:aws:sns:us-east-1:123456789012:IoT-HighBandwidthUsage_
+7. In the navigation pane select Subscriptions, and then click on **Create subscription** button
+8. In Topic ARN select the value from step 4
+9. In Protocol select **'Email'**
+10. Enter your e-mail on **'Endpoint'** 
 
 
 ## Create a Lambda Function ##
 1. Open the Lambda console at https://console.aws.amazon.com/lambda
 2. In the navigation pane select Functions, and then click on **Create function** button
 3. Enter the Function name as **'IoT-HighBandwidthUsage'**
-4. Expand the Permissions section, on Execution role choose to **Use an existing role**, select Existing role as **iot-event-notification-lambda-role** and then click on **Create function** button
+4. Expand the **Permissions** section, on Execution role choose to **Use an existing role**, select Existing role as **iot-event-notification-lambda-role** and then click on **Create function** button
 5. Replace the sample source code by the content located in the **index.js** located inside lambda directory, and observe how AWS-SDK is used to manipulate files on S3 and to send notifications using SNS
 6. On Environment variables add two variables:
    - **'THRESHOLD'** with value **'95'**
