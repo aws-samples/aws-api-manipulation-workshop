@@ -39,8 +39,8 @@ _Note: Tested in the N. Virginia region (us-east-1)._
 bucket=<YOUR_PREFIX>-network-iot
 aws s3 mb s3://$bucket
 aws ssm put-parameter --name "/iot/bucket" --value "$bucket" --type String
-git clone https://github.com/aws-samples/aws-apis-and-automation.git
-cd aws-apis-and-automation
+git clone https://github.com/aws-samples/aws-api-manipulation-workshop.git
+cd aws-api-manipulation-workshop
 aws s3 cp gateway s3://$bucket --recursive
 ```
 
