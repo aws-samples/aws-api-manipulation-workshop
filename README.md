@@ -22,7 +22,7 @@ _Note: Tested in the N. Virginia region (us-east-1)._
 ## CloudFormation
 1. Open the CloudFormation console at https://console.aws.amazon.com/cloudformation
 2. On the Welcome page, click on **Create stack** button
-3. On Step 1 - Specify template: Choose Upload a template file, click on **Choose file** button and select the **template.yaml** located inside cloudformation directory
+3. On Step 1 - Specify template: Choose Upload a template file, click on **Choose file** button and select the **template.yaml** located inside **cloudformation** directory
 4. On Step 2 - Specify stack details: Enter the Stack name as **'iot-stack'**
 5. On Step 3 - Configure stack options: Just click on **Next** button
 6. On Step 4 - Review: Enable the checkbox **I acknowledge that AWS CloudFormation might create IAM resources with custom names.**, and click on **Create Stack** button
@@ -39,7 +39,8 @@ _Note: Tested in the N. Virginia region (us-east-1)._
 bucket=<YOUR_PREFIX>-network-iot
 aws s3 mb s3://$bucket
 aws ssm put-parameter --name "/iot/bucket" --value "$bucket" --type String
-git clone https://github.com/aws-samples/aws-apis-and-automation.git .
+git clone https://github.com/aws-samples/aws-apis-and-automation.git
+cd aws-apis-and-automation
 aws s3 cp gateway s3://$bucket --recursive
 ```
 
