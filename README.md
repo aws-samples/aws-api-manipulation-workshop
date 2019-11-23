@@ -50,16 +50,7 @@ _Note: **<YOUR_PREFIX>** must be replaced with your nickname to avoid conflicts 
 ## Create a SNS Topic & Subscription ##
 1. Open the SNS (Simple Notification Service) console at https://console.aws.amazon.com/sns
 2. In the navigation pane select Topics, and then click on **Create topic** button
-3. Enter the topic name as **'IoT-HighBandwidthUsage'**
-4. Expand the **Access policy** section, on method role choose to **Advanced** and replace the **Condition** property as follow on JSON editor:
-```
-"Condition": {
-  "ArnLike": {
-    "AWS:SourceArn": "arn:aws:s3:*:*:*"
-  }
-}
-```
-5. Click on **Create topic** button
+3. Enter the topic name as **'IoT-HighBandwidthUsage'**, and then click on **Create topic** button
 6. Under the Details panel, take note of topic **ARN** which should look like _arn:aws:sns:us-east-1:123456789012:IoT-HighBandwidthUsage_
 7. In the navigation pane select Subscriptions, and then click on **Create subscription** button
 8. In Topic ARN select the value from step 4
