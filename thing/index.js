@@ -1,4 +1,5 @@
 const NUM_DEVICES = 5;
+const URL = process.argv[2];
 
 const http = require('http');
 
@@ -19,7 +20,7 @@ var payload = {
 };
 
 const options = {
-    hostname: 'localhost',
+    hostname: URL,
     port: 80,
     path: '/device',
     method: 'POST',

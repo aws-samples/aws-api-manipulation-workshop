@@ -1,13 +1,14 @@
 #!/bin/bash -e
-amount=$1
+elb=$1
+amount=$2
 
-if [[ $# -ne 1 ]] ; then
-    echo "Usage: ${0} request_amount"
+if [[ $# -ne 2 ]] ; then
+    echo "Usage: ${0} loadbalancer_dns request_amount"
     exit 1
 fi
 
 for ((i=0; i < $amount; i++))
 do
-    node index.js 1
+    node index.js $elb
     sleep .001
 done
