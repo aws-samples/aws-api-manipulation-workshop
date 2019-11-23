@@ -41,7 +41,7 @@ aws s3 mb s3://$bucket
 aws ssm put-parameter --name "/iot/bucket" --value "$bucket" --type String
 git clone https://github.com/aws-samples/aws-api-manipulation-workshop.git
 cd aws-api-manipulation-workshop
-aws s3 cp gateway s3://$bucket --recursive
+aws s3 cp gateway s3://$bucket/gateway --recursive
 ```
 
 _Note: **<YOUR_PREFIX>** must be replaced with your nickname to avoid conflicts due S3 global namespace_
