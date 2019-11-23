@@ -51,7 +51,7 @@ _Note: **<YOUR_PREFIX>** must be replaced with your nickname to avoid conflicts 
 1. Open the SNS (Simple Notification Service) console at https://console.aws.amazon.com/sns
 2. In the navigation pane select Topics, and then click on **Create topic** button
 3. Enter the topic name as **'IoT-HighBandwidthUsage'**
-4. Expand the **Access policy** section, on method role choose to **Advanced** and update the **Condition** property as follow on JSON editor:
+4. Expand the **Access policy** section, on method role choose to **Advanced** and replace the **Condition** property as follow on JSON editor:
 ```
 "Condition": {
   "ArnLike": {
