@@ -16,7 +16,7 @@ To get started you will need an IAM user with the following access:
 - Amazon Simple Notification Service
 - AWS CloudFormation
 
-_Note: Tested in the N. Virginia region (us-east-1)._
+_Note: Supported in the N. Virginia (us-east-1) AWS Region only._
 
 
 ## CloudFormation
