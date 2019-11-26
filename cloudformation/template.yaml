@@ -308,6 +308,7 @@ Resources:
     Properties:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
+        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'
       Policies:
         - PolicyName: !Sub '${Prefix}-AppPolicy'
           PolicyDocument:
@@ -334,7 +335,6 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess'
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-        - 'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'
       Policies:
         - PolicyName: !Sub '${Prefix}-SNSPublisher'
           PolicyDocument:
