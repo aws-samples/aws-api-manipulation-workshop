@@ -296,7 +296,7 @@ Resources:
         sudo aws s3 sync s3://$bucket/gateway /gateway
         cd /gateway
         sudo npm install
-        sudo nohup node server.js 2>&1 &
+        sudo node server.js $bucket > gateway.log 2>&1 &
       LaunchConfigurationName: !Sub '${Prefix}-app-lc'
   AppInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'

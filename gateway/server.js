@@ -1,4 +1,4 @@
-const bucket = 'tgpadua-network-iot';
+const bucket = process.argv[2];
 
 const port = process.env.PORT || 80;
 const AWS = require('aws-sdk');
